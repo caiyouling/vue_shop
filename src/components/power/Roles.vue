@@ -39,7 +39,7 @@
                 <el-table-column label="操作" width="300px">
                     <template slot-scope="scope">
                         <el-button size="mini" type="primary" icon="el-icon-edit" @click="editRole(scope.row.id)">编辑</el-button>
-                        <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
+                        <el-button size="mini" type="danger" icon="el-icon-delete" @click="removeRoles(scope.row.id)">删除</el-button>
                         <el-button size="mini" type="warning" icon="el-icon-setting" @click="showSetRightDialog(scope.row)">分配权限</el-button>
                     </template>
                     </el-table-column>
@@ -217,6 +217,21 @@ export default {
         if(res.meta.status!==200) return this.$message.error('分配用户权限列表失败');
         this.$message.success('分配用户权限列表成功');
         this.setRightDialogVisible=false;
+        this.getRolesList();
+    },
+    // 删除角色
+    async removeRoles(id){
+        // 询问是否确认删除
+        const confirm =await this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).catch(err=>err);
+        if(confirm !== 'confirm') return this.$message.info('已取消操作');
+        // 向后台请求删除该角色
+        const {data:res}=await this.$http.delete('/roles/'+id);
+        if(res.meta.status!==200) return this.$message.error('删除角色失败');
+        this.$message.success('删除角色成功');
         this.getRolesList();
     }
     } 
